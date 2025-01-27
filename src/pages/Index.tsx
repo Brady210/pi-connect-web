@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import StatusIndicator from "@/components/StatusIndicator";
 import DeviceInfo from "@/components/DeviceInfo";
 import ConnectionButton from "@/components/ConnectionButton";
+import CameraFeed from "@/components/CameraFeed";
 import { toast } from "sonner";
 
 const Index = () => {
@@ -58,6 +59,8 @@ const Index = () => {
               <ConnectionButton connected={connected} onToggle={handleConnection} />
             </div>
           </div>
+
+          <CameraFeed connected={connected} />
         </div>
       </div>
     </div>
