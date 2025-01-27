@@ -89,7 +89,7 @@ const Index = () => {
             </div>
           </div>
 
-          <CameraFeed connected={connected} isArmed={isArmed} />
+          <CameraFeed connected={connected} />
         </div>
       </div>
     </div>
