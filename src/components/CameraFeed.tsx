@@ -13,6 +13,8 @@ const CameraFeed = ({ connected, isArmed }: CameraFeedProps) => {
   const previousFrameRef = useRef<ImageData | null>(null);
 
   const detectMotion = (context: CanvasRenderingContext2D, width: number, height: number) => {
+    if (width === 0 || height === 0) return; // Skip if dimensions are not set
+    
     const currentFrame = context.getImageData(0, 0, width, height);
     
     if (previousFrameRef.current) {
@@ -47,23 +49,31 @@ const CameraFeed = ({ connected, isArmed }: CameraFeedProps) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             
-            // Set up motion detection if system is armed
-            if (isArmed) {
-              const context = canvasRef.current?.getContext('2d');
-              const checkMotion = () => {
-                if (context && videoRef.current && canvasRef.current) {
-                  canvasRef.current.width = videoRef.current.videoWidth;
-                  canvasRef.current.height = videoRef.current.videoHeight;
-                  context.drawImage(videoRef.current, 0, 0);
-                  detectMotion(context, canvasRef.current.width, canvasRef.current.height);
-                }
-                if (isArmed) {
-                  requestAnimationFrame(checkMotion);
-                }
-              };
-              
-              requestAnimationFrame(checkMotion);
-            }
+            // Wait for video to be loaded before starting motion detection
+            videoRef.current.onloadedmetadata = () => {
+              if (isArmed && canvasRef.current) {
+                const context = canvasRef.current.getContext('2d');
+                
+                const checkMotion = () => {
+                  if (context && videoRef.current && canvasRef.current) {
+                    // Set canvas dimensions to match video
+                    canvasRef.current.width = videoRef.current.videoWidth;
+                    canvasRef.current.height = videoRef.current.videoHeight;
+                    
+                    // Only process if we have valid dimensions
+                    if (videoRef.current.videoWidth > 0 && videoRef.current.videoHeight > 0) {
+                      context.drawImage(videoRef.current, 0, 0);
+                      detectMotion(context, canvasRef.current.width, canvasRef.current.height);
+                    }
+                  }
+                  if (isArmed) {
+                    requestAnimationFrame(checkMotion);
+                  }
+                };
+                
+                requestAnimationFrame(checkMotion);
+              }
+            };
           }
         })
         .catch(err => {
