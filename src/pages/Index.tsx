@@ -3,10 +3,13 @@ import StatusIndicator from "@/components/StatusIndicator";
 import DeviceInfo from "@/components/DeviceInfo";
 import ConnectionButton from "@/components/ConnectionButton";
 import CameraFeed from "@/components/CameraFeed";
+import { Shield, ShieldOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 const Index = () => {
   const [connected, setConnected] = useState(false);
+  const [isArmed, setIsArmed] = useState(false);
   const [deviceInfo, setDeviceInfo] = useState({
     ipAddress: "192.168.1.100",
     hostname: "raspberrypi",
@@ -16,6 +19,15 @@ const Index = () => {
   const handleConnection = () => {
     setConnected(!connected);
     toast(connected ? "Disconnected from device" : "Connected to device");
+  };
+
+  const handleArmToggle = () => {
+    setIsArmed(!isArmed);
+    toast(
+      isArmed 
+        ? "System Disarmed - Motion detection stopped" 
+        : "System Armed - Motion detection active"
+    );
   };
 
   useEffect(() => {
@@ -55,8 +67,25 @@ const Index = () => {
 
             <DeviceInfo {...deviceInfo} />
 
-            <div className="pt-4">
+            <div className="flex gap-4 pt-4">
               <ConnectionButton connected={connected} onToggle={handleConnection} />
+              <Button
+                variant={isArmed ? "destructive" : "default"}
+                onClick={handleArmToggle}
+                disabled={!connected}
+              >
+                {isArmed ? (
+                  <>
+                    <ShieldOff className="mr-2 h-4 w-4" />
+                    Disarm System
+                  </>
+                ) : (
+                  <>
+                    <Shield className="mr-2 h-4 w-4" />
+                    Arm System
+                  </>
+                )}
+              </Button>
             </div>
           </div>
 
