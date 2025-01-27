@@ -18,7 +18,7 @@ const Index = () => {
   };
 
   useEffect(() => {
-    let interval: number;
+    let interval: NodeJS.Timeout;
     if (connected) {
       let seconds = 0;
       interval = setInterval(() => {
