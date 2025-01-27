@@ -32,7 +32,7 @@ const CameraFeed = ({ connected, isArmed }: CameraFeedProps) => {
         }
       }
       
-      if (diff > minPixelDiff) {
+      if (diff > minPixelDiff && isArmed) {
         toast("Motion Detected!", {
           description: new Date().toLocaleTimeString()
         });
