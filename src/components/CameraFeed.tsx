@@ -1,35 +1,15 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import VideoDisplay from './VideoDisplay';
+import MotionDetector from './MotionDetector';
 
 interface CameraFeedProps {
   connected: boolean;
+  isArmed: boolean;
 }
 
-const CameraFeed = ({ connected }: CameraFeedProps) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  useEffect(() => {
-    if (connected && videoRef.current) {
-      // In a real implementation, this would connect to the Raspberry Pi camera stream
-      // For now, we'll just show the local camera as a placeholder
-      navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => {
-          if (videoRef.current) {
-            videoRef.current.srcObject = stream;
-          }
-        })
-        .catch(err => {
-          console.error("Error accessing camera:", err);
-        });
-
-      return () => {
-        if (videoRef.current && videoRef.current.srcObject) {
-          const stream = videoRef.current.srcObject as MediaStream;
-          stream.getTracks().forEach(track => track.stop());
-        }
-      };
-    }
-  }, [connected]);
+const CameraFeed = ({ connected, isArmed }: CameraFeedProps) => {
+  const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
 
   if (!connected) {
     return (
@@ -50,12 +30,8 @@ const CameraFeed = ({ connected }: CameraFeedProps) => {
         <CardTitle>Camera Feed</CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          className="w-full h-[300px] object-cover rounded-b-lg"
-        />
+        <VideoDisplay onVideoLoad={setVideoElement} />
+        <MotionDetector video={videoElement} isArmed={isArmed} />
       </CardContent>
     </Card>
   );
